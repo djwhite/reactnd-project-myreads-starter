@@ -1,3 +1,8 @@
 node_modules
 yarn.lock
 .DS_Store
+
+.editorconfig
+.eslintrc.json
+jsconfig.json
+.vscode
