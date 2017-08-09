@@ -1,15 +1,17 @@
 {
-  "name" : "myreads",
-  "version" : "0.0.1",
+  "name": "myreads",
+  "version": "0.0.1",
   "dependencies": {
+    "escape-string-regexp": "^1.0.5",
     "prop-types": "^15.5.10",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
-    "react-router-dom": "^4.1.2"
+    "react-router-dom": "^4.1.2",
+    "sort-by": "^1.2.0"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
-    "eslint": "^4.3.0",
+    "eslint": "^3.19",
     "eslint-plugin-react": "^7.1.0",
     "react-scripts": "1.0.7"
   },
