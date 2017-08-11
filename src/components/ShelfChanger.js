@@ -32,7 +32,7 @@ class ShelfChanger extends Component {
 
     return (
       <div className="book-shelf-changer">
-        <select onChange={(event) => this.onShelfChanged(event)} value={book.shelf}>
+        <select onChange={(event) => this.onShelfChanged(event)} value={book.shelf || 'none'}>
           {Object.keys(options).map(
             (key) => (
               options[key].enabled ?
