@@ -8,7 +8,8 @@ import Bookshelf from './Bookshelf';
 class SearchBooks extends Component {
   static propTypes = {
     books: PropTypes.array.isRequired,
-    onUpdateShelf: PropTypes.func.isRequired
+    onUpdateShelf: PropTypes.func.isRequired,
+    onSearch: PropTypes.func.isRequired
   }
 
   state = {
@@ -17,6 +18,12 @@ class SearchBooks extends Component {
 
   updateQuery = (query) => {
     this.setState({ query: query.trim() })
+  }
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    let search = document.getElementById('search-input').value;
+    this.props.onSearch(search);
   }
 
   render() {
@@ -46,12 +53,15 @@ class SearchBooks extends Component {
               However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
               you don't find a specific author or title. Every search is limited by search terms.
             */}
-            <input
-              type="text"
-              placeholder="Search by title or author"
-              value={query}
-              onChange={(event) => this.updateQuery(event.target.value)}
-            />
+            <form onSubmit={this.handleSubmit}>
+              <input
+                id="search-input"
+                type="text"
+                placeholder="Search by title or author"
+                value={query}
+                onChange={(event) => this.updateQuery(event.target.value)}
+              />
+            </form>
           </div>
         </div>
 

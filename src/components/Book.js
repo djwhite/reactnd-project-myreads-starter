@@ -18,7 +18,7 @@ class Book extends Component {
           <ShelfChanger book={book} onUpdateShelf={this.props.onUpdateShelf}/>
         </div>
         <div className="book-title">{book.title}</div>
-        <div className="book-authors">{book.authors[0]}</div>
+        {book.authors && book.authors.map((author) => (<div key={author} className="book-authors">{author}</div>))}
       </div>
     );
   }
