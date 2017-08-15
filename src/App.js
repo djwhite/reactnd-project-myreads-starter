@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { BrowserRouter, Link, Route } from 'react-router-dom';
+import { BrowserRouter, Link, Route, Switch } from 'react-router-dom';
 import * as BooksAPI from './BooksAPI';
 import './App.css';
 import BookshelvesPage from './pages/BookshelvesPage';
 import SearchPage from './pages/SearchPage';
+import InvalidRoute from './pages/InvalidRoute';
 
 class BooksApp extends Component {
   state = {
@@ -18,28 +19,16 @@ class BooksApp extends Component {
   }
 
   updateShelf = (book, shelf) => {
-    BooksAPI.update(book, shelf);
+    BooksAPI.update(book, shelf).then(() => {
+      book.shelf = shelf
 
-    let found = false;
-
-    // Attempt to update the book:
-    this.setState((state) => ({
-      books: state.books.map(b => {
-        if (b.id === book.id) {
-          b.shelf = shelf;
-          found = true;
-        }
-        return b;
-      })
-    }));
-
-    if (!found) {
-      book.shelf = shelf;
-      // It's a new one from search
-      this.setState((state) => ({
-        books: state.books.concat([ book ])
-      }));
-    }
+      // The book being added could be a new one from search, so
+      // filter out any existing book matching that ID so we don't
+      // have two copies.
+      this.setState(previousState => ({
+        books: previousState.books.filter(b => b.id !== book.id).concat([book])
+      }))
+    });
   }
 
   getShelf = (book) => {
@@ -51,26 +40,40 @@ class BooksApp extends Component {
     }
   }
 
+  isEmptyOrBlank = (query) => {
+    return (!query || query.trim().length === 0);
+  }
+
   searchBooks = (query) => {
-    BooksAPI.search(query, 20).then((bookSearchResults) => {
-      // The search API doesn't seem to populate the shelf,
-      // so update it here so the shelfchanger reflects the
-      // current shelf.
+    if (!this.isEmptyOrBlank(query)) {
+      BooksAPI.search(query, 20).then((bookSearchResults) => {
+        // The search API doesn't seem to populate the shelf,
+        // so update it here so the shelfchanger reflects the
+        // current shelf.
+        if (bookSearchResults && bookSearchResults.length > 0)
+        {
+          this.setState((state) => ({
+            ...state,
+            bookSearchResults: bookSearchResults.map(book => {
+              if (!book.shelf) {
+                const existingBook = this.getShelf(book);
+                if (existingBook) {
+                  book.shelf = existingBook.shelf || 'none';
+                } else {
+                  book.shelf = 'none';
+                }
+              }
+              return book;
+            })
+          }));
+        }
+      });
+    } else {
       this.setState((state) => ({
         ...state,
-        bookSearchResults: bookSearchResults.map(book => {
-          if (!book.shelf) {
-            const existingBook = this.getShelf(book);
-            if (existingBook) {
-              book.shelf = existingBook.shelf || 'none';
-            } else {
-              book.shelf = 'none';
-            }
-          }
-          return book;
-        })
+        bookSearchResults: []
       }));
-    });
+    }
   }
 
   render() {
@@ -79,22 +82,27 @@ class BooksApp extends Component {
     return (
       <BrowserRouter>
         <div className="app">
-          <Route exact path="/" render={() => (
-            <div>
-              <BookshelvesPage books={books} onUpdateShelf={this.updateShelf} />
-              <div className="open-search">
-                <Link to="/search">Search</Link>
+          <Switch>
+            <Route exact path="/" render={() => (
+              <div>
+                <BookshelvesPage books={books} onUpdateShelf={this.updateShelf} />
+                <div className="open-search">
+                  <Link to="/search">Search</Link>
+                </div>
               </div>
-            </div>
-          )} />
+            )} />
 
-          <Route exact path="/search" render={() => (
-            <SearchPage
-              books={bookSearchResults}
-              onUpdateShelf={this.updateShelf}
-              onSearch={this.searchBooks} />
-          )} />
+            <Route exact path="/search" render={() => (
+              <SearchPage
+                books={bookSearchResults}
+                onUpdateShelf={this.updateShelf}
+                onSearch={this.searchBooks} />
+            )} />
+
+            <Route component={InvalidRoute} />
+          </Switch>
         </div>
+
       </BrowserRouter>
     );
   }

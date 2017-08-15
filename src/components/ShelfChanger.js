@@ -8,16 +8,6 @@ class ShelfChanger extends Component {
     onUpdateShelf: PropTypes.func.isRequired
   };
 
-  state = {
-    options: {
-      moveTo: { text: 'Move to...', enabled: false },
-      currentlyReading: { text: 'Currently Reading', enabled: true },
-      wantToRead: { text: 'Want to Read', enabled: true },
-      read: { text: 'Read', enabled: true },
-      none: { text: 'None', enabled: true }
-    }
-  }
-
   onShelfChanged = function (event) {
     const { book, onUpdateShelf } = this.props;
 
@@ -28,7 +18,14 @@ class ShelfChanger extends Component {
 
   render() {
     const { book } = this.props;
-    const { options } = this.state;
+
+    const options = {
+      moveTo: { text: 'Move to...', enabled: false },
+      currentlyReading: { text: 'Currently Reading', enabled: true },
+      wantToRead: { text: 'Want to Read', enabled: true },
+      read: { text: 'Read', enabled: true },
+      none: { text: 'None', enabled: true }
+    }
 
     return (
       <div className="book-shelf-changer">
